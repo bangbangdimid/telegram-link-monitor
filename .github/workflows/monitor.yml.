@@ -1,0 +1,29 @@
+name: Link Change Monitor
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Chạy mỗi giờ một lần
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests gspread google-auth-oauthlib
+
+      - name: Run monitor script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          GCP_CREDS_JSON: ${{ secrets.GCP_CREDS_JSON }}
+        run: python monitor.py
